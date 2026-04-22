@@ -1,0 +1,7 @@
+<svg width="220" height="56" viewBox="0 0 220 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="56" rx="16" fill="#0B5CAB"/>
+  <rect x="10" y="10" width="36" height="36" rx="10" fill="#F3F7FB"/>
+  <path d="M19 38V18H24.6L31.6 31.2L38.6 18H44V38H39.4V25.8L33.2 37.4H29.8L23.6 25.8V38H19Z" fill="#0B5CAB"/>
+  <text x="58" y="25" fill="#F3F7FB" font-family="'Avenir Next', Avenir, 'Segoe UI', sans-serif" font-size="15" font-weight="700">Mavicode Solutions</text>
+  <text x="58" y="40" fill="#CFE0F5" font-family="'Avenir Next', Avenir, 'Segoe UI', sans-serif" font-size="10" font-weight="500" letter-spacing="0.18em">FBA CALCULATOR</text>
+</svg>
