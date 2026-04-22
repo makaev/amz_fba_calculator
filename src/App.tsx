@@ -17,7 +17,7 @@ export default function App() {
         </div>
         <h2>Amazon FBA Fee calculator for United Kingdom, Europe and United States </h2>
         <p>
-          Real-time FBA fee calculation, Size-tire determination, Category modifiers, Dangerous Goods and Hazmat adjustments,
+          Real-time FBA fee calculation, Size-tier determination, Category modifiers, Dangerous Goods and Hazmat adjustments,
           SIPP Discount.
         </p>
       </header>
