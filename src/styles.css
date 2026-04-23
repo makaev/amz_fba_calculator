@@ -124,6 +124,19 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.mode-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(11, 92, 171, 0.18);
+  border-radius: 999px;
+  padding: 0.32rem;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 24px rgba(8, 58, 115, 0.08);
+  gap: 0.35rem;
+  margin: 0.75rem 0 0.4rem;
+  backdrop-filter: blur(10px);
+}
+
+.mode-toggle button,
 .region-toggle button {
   border: 0;
   border-radius: 999px;
@@ -136,10 +149,12 @@ body {
   transition: background-color 180ms ease, color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
+.mode-toggle button:hover,
 .region-toggle button:hover {
   color: var(--accent-strong);
 }
 
+.mode-toggle button.active,
 .region-toggle button.active {
   background: linear-gradient(135deg, var(--accent), #1a74ce);
   color: #fff;
@@ -287,10 +302,189 @@ select:focus {
   color: var(--muted);
 }
 
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-heading p {
+  margin: 0.35rem 0 0;
+}
+
+.bulk-panel,
+.bulk-results-card {
+  overflow: hidden;
+}
+
+.bulk-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.stat-pill,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stat-pill {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.status-pill.pending {
+  background: rgba(88, 112, 138, 0.12);
+  color: var(--muted);
+}
+
+.status-pill.success {
+  background: rgba(15, 143, 85, 0.14);
+  color: #0f7d50;
+}
+
+.status-pill.error {
+  background: rgba(192, 45, 45, 0.12);
+  color: var(--danger);
+}
+
+.bulk-file-input {
+  margin-bottom: 0.55rem;
+}
+
+.bulk-file-name {
+  margin: 0 0 1rem;
+}
+
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primary-button,
+.secondary-button {
+  border: 0;
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--accent), #1a74ce);
+  color: #fff;
+  box-shadow: 0 12px 22px rgba(11, 92, 171, 0.22);
+}
+
+.secondary-button {
+  background: rgba(220, 236, 255, 0.85);
+  color: var(--accent-strong);
+  border: 1px solid rgba(11, 92, 171, 0.14);
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.bulk-error-card {
+  border: 1px solid rgba(192, 45, 45, 0.18);
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  background: rgba(255, 245, 245, 0.86);
+  margin-bottom: 1rem;
+}
+
+.bulk-error-card h3 {
+  margin: 0 0 0.55rem;
+  color: var(--danger);
+}
+
+.bulk-error-list {
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--danger);
+}
+
+.bulk-table-wrap {
+  overflow-x: auto;
+  margin: 0 -0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.bulk-table {
+  width: 100%;
+  min-width: 1780px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.bulk-table th,
+.bulk-table td {
+  border-bottom: 1px solid rgba(11, 92, 171, 0.1);
+  padding: 0.72rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.bulk-table th {
+  position: sticky;
+  top: 0;
+  background: rgba(243, 247, 251, 0.98);
+  color: var(--accent-strong);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.bulk-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.46);
+}
+
 @media (max-width: 760px) {
   .row.two,
   .checkboxes {
     grid-template-columns: 1fr;
+  }
+
+  .mode-toggle,
+  .region-toggle,
+  .bulk-actions {
+    width: 100%;
+  }
+
+  .mode-toggle,
+  .region-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel-heading {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
   }
 
   .hero {

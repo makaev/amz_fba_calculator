@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BulkCalculationPanel } from './components/BulkCalculationPanel';
 import { EU_CATEGORIES, EU_FORM_CONFIG, EU_MARKETPLACE_OPTIONS, US_CATEGORIES, US_FEE_CONFIG } from './config';
 import { FeeCalculatorForm } from './components/FeeCalculatorForm';
 import { RegionToggle } from './components/RegionToggle';
@@ -6,8 +7,11 @@ import { calculateEUFee } from './services/euFeeService';
 import { calculateUSFee } from './services/usFeeService';
 import { Region } from './types';
 
+type AppMode = 'single' | 'bulk';
+
 export default function App() {
   const [activeRegion, setActiveRegion] = useState<Region>('EU');
+  const [mode, setMode] = useState<AppMode>('single');
 
   return (
     <main className="app-shell">
@@ -22,28 +26,43 @@ export default function App() {
         </p>
       </header>
 
-      <RegionToggle value={activeRegion} onChange={setActiveRegion} />
-
-      <div className="forms-grid">
-        <div className={activeRegion === 'EU' ? 'visible-panel' : 'hidden-panel'}>
-          <FeeCalculatorForm
-            title="EU FBA Calculator"
-            config={EU_FORM_CONFIG}
-            categories={EU_CATEGORIES}
-            marketplaceOptions={EU_MARKETPLACE_OPTIONS}
-            calculate={calculateEUFee}
-          />
-        </div>
-
-        <div className={activeRegion === 'US' ? 'visible-panel' : 'hidden-panel'}>
-          <FeeCalculatorForm
-            title="US FBA Calculator"
-            config={US_FEE_CONFIG}
-            categories={US_CATEGORIES}
-            calculate={calculateUSFee}
-          />
-        </div>
+      <div className="mode-toggle" role="tablist" aria-label="Calculator mode">
+        <button type="button" className={mode === 'single' ? 'active' : ''} onClick={() => setMode('single')}>
+          Single item
+        </button>
+        <button type="button" className={mode === 'bulk' ? 'active' : ''} onClick={() => setMode('bulk')}>
+          Bulk analysis
+        </button>
       </div>
+
+      {mode === 'single' ? (
+        <>
+          <RegionToggle value={activeRegion} onChange={setActiveRegion} />
+
+          <div className="forms-grid">
+            <div className={activeRegion === 'EU' ? 'visible-panel' : 'hidden-panel'}>
+              <FeeCalculatorForm
+                title="EU FBA Calculator"
+                config={EU_FORM_CONFIG}
+                categories={EU_CATEGORIES}
+                marketplaceOptions={EU_MARKETPLACE_OPTIONS}
+                calculate={calculateEUFee}
+              />
+            </div>
+
+            <div className={activeRegion === 'US' ? 'visible-panel' : 'hidden-panel'}>
+              <FeeCalculatorForm
+                title="US FBA Calculator"
+                config={US_FEE_CONFIG}
+                categories={US_CATEGORIES}
+                calculate={calculateUSFee}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        <BulkCalculationPanel />
+      )}
     </main>
   );
 }

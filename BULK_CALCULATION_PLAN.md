@@ -19,7 +19,7 @@ This document captures the current agreed direction so implementation can resume
 
 ### CSV input schema
 
-Current preferred input columns:
+Confirmed input columns for v1:
 
 - `asin`
 - `market`
@@ -33,6 +33,7 @@ Current preferred input columns:
 - `category`
 - `sipp`
 - `dangerous`
+- `lithium_battery`
 
 ### Why separate unit columns
 
@@ -55,7 +56,7 @@ with these meanings:
 ### Calculator routing
 
 - `market` must route each row to the correct calculator.
-- Supported values should align with the current calculator scope:
+- Confirmed supported values for v1:
   - `US`
   - `UK`
   - `DE`
@@ -67,12 +68,15 @@ with these meanings:
 
 - Transport surcharge should be applied automatically in bulk mode.
 - The current code already applies surcharge automatically for US.
+- Bulk mode should apply surcharge automatically for both EU and US.
 - EU currently has an optional surcharge toggle in the single-item flow, so bulk mode will need a deliberate business rule override or a shared rule update.
 
 ### Optional flags
 
 - `sipp` should be row-level and optional.
 - `dangerous` should be row-level and optional.
+- `lithium_battery` should be row-level and optional.
+- `dangerous` and `lithium_battery` must remain separate inputs.
 - Missing values should default to `false`.
 
 ### ASIN behavior
@@ -101,6 +105,7 @@ Optional columns:
 
 - `sipp`
 - `dangerous`
+- `lithium_battery`
 
 ### Row validation
 
@@ -112,9 +117,9 @@ Per-row validation should enforce:
 - `weight_unit`: `kg` or `lb`
 - `length`, `width`, `height`, `weight`, `price`: numeric and greater than `0`
 - `category`: non-empty string
-- `sipp`, `dangerous`: accept common boolean formats such as `true/false`, `yes/no`, `1/0`
+- `sipp`, `dangerous`, `lithium_battery`: accept common boolean formats such as `true/false`, `yes/no`, `1/0`, and uppercase variants
 
-Unknown extra columns should be preserved if possible, but ignored by the calculation engine.
+Unknown extra columns should be ignored by the calculation engine and should not be preserved in the export for v1.
 
 ## Output Table Design
 
@@ -134,6 +139,7 @@ The exported table should include the original input columns plus calculation ou
 - `category`
 - `sipp`
 - `dangerous`
+- `lithium_battery`
 - `calculation_status`
 - `error_message`
 - `currency_symbol`
@@ -154,6 +160,7 @@ The exported table should include the original input columns plus calculation ou
 - Preserve row order from the uploaded file.
 - Include invalid rows in the export with `calculation_status=error` and an `error_message`.
 - Export should remain possible even when some rows fail validation.
+- Extra input columns outside the supported contract should not be included in the exported file for v1.
 
 ## Recommended Technical Design
 
@@ -193,8 +200,11 @@ Do not force bulk import into the single-item calculator form.
 
 Recommended approach:
 
-- add a dedicated bulk-calculation section, tab, or mode switch
+- add a separate page-like bulk-calculation panel within the same app
 - keep single-item calculation and bulk calculation as separate workflows
+- allow upload and validation first, then run calculation only after the user clicks `Calculate`
+- include a downloadable sample CSV template with one EU row and one US row
+- optimize the v1 experience for files up to 500 rows
 
 Suggested components:
 
@@ -215,6 +225,7 @@ Tasks:
 - add bulk CSV row and export row interfaces
 - add narrow enums or string unions for bulk unit and market fields
 - define a normalized result type for row-level success/error handling
+- add support for the `lithium_battery` column in bulk row models
 
 ### Phase 2: parsing and normalization
 
@@ -228,6 +239,7 @@ Tasks:
 - parse CSV text into row objects
 - validate required headers
 - normalize booleans, numbers, units, and market values
+- accept case-insensitive boolean values for supported boolean columns
 - extend validation helpers only where shared logic is genuinely reusable
 
 ### Phase 3: calculation adapter
@@ -242,7 +254,7 @@ Tasks:
 
 - build a row-to-calculator adapter using existing calculation entry points
 - enforce automatic transport surcharge for bulk mode
-- map `sipp` and `dangerous` CSV values into `CalculatorInput`
+- map `sipp`, `dangerous`, and `lithium_battery` CSV values into `CalculatorInput`
 - standardize row-level result formatting for UI and export
 
 ### Phase 4: UI workflow
@@ -258,8 +270,11 @@ Tasks:
 
 - add a bulk mode entry point to the app
 - add file upload and header/error feedback
+- add a sample CSV download action
+- show parsed rows before calculation
 - render imported rows and calculated outputs in a table
 - support empty, loading, success, and partial-error states
+- keep invalid rows visible with row-level errors and allow them to be exported
 
 ### Phase 5: export
 
@@ -279,19 +294,17 @@ Tasks:
 1. Finalize the CSV contract.
 2. Build parsing and row validation.
 3. Build the bulk calculation adapter on top of existing calculators.
-4. Add a simple preview table.
-5. Add export.
+4. Add a preview table and explicit `Calculate` action.
+5. Add export and sample CSV download.
 6. Polish error messaging and large-file behavior.
 
 ## Open Questions
 
-These should be confirmed before implementation starts:
+These are not blockers, but should be decided during implementation if they affect UX details:
 
-1. Is `market` limited to `US`, `UK`, `DE`, `ES`, `IT`, `FR`?
-2. Should category values be strict enums, free text, or normalized aliases?
-3. Should `dangerous` also imply lithium-battery handling anywhere, or remain separate from lithium-specific logic?
-4. Should bulk mode support extra user-defined columns and preserve them in the export?
-5. What is the expected maximum CSV size for the first release?
+1. Should `market` parsing be case-insensitive for values like `us` and `uk`, or strict uppercase only?
+2. Should the results table show every breakdown column by default, or keep some columns behind a details view?
+3. Should the sample CSV be generated client-side or shipped as a static file?
 
 ## Risks
 
@@ -299,6 +312,20 @@ These should be confirmed before implementation starts:
 - inconsistent market strings could route rows incorrectly
 - large tables may need pagination or virtualization later
 - EU surcharge behavior differs from the current single-item UX and must be handled intentionally
+- a wide results table may become hard to use on smaller screens without progressive disclosure
+
+## Performance Target
+
+### v1 target
+
+- officially support bulk files up to 500 rows
+- optimize UX and rendering for 500 rows without requiring virtualization
+
+### Implications for implementation
+
+- keep parsing and calculation client-side for v1
+- design the results table carefully to avoid rendering unnecessary detail by default
+- defer virtualization, worker offloading, and very large file support to a later version
 
 ## Estimate
 
@@ -316,6 +343,6 @@ The longer estimate assumes stronger validation, better table UX, partial-failur
 
 When implementation starts, begin with:
 
-1. confirming the final CSV header contract
-2. deciding whether bulk mode should force the EU surcharge rule directly in the service layer
-3. adding bulk-specific types in `src/types.ts`
+1. adding the confirmed bulk CSV types and row result models in `src/types.ts`
+2. implementing CSV parsing and header validation for `asin, market, dimension_unit, weight_unit, length, width, height, weight, price, category, sipp, dangerous, lithium_battery`
+3. building the bulk adapter that forces automatic surcharge and maps separate `dangerous` and `lithium_battery` flags into the existing calculators
