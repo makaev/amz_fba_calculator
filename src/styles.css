@@ -83,7 +83,7 @@ body {
 .hero-logo {
   display: block;
   /* width: min(220px, 100%); */
-  height: 44px;
+  height: 100px;
   object-fit: contain;
 }
 
